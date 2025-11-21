@@ -22,6 +22,10 @@
       "portfolio": {
         "title": "portfolio",
         "description": "my personal portfolio."
+      },
+      "games": {
+        "title": "games",
+        "description": "mini games"
       }
     }
   }

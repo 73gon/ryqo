@@ -1,19 +1,35 @@
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { ExternalLink, BookOpen, User } from 'lucide-react'
+import { ExternalLink, BookOpen, User, LayoutTemplate } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import SpotlightCard from '@/components/SpotlightCard'
 
 export function Home() {
   const { t } = useTranslation()
+  const [portfolioImageError, setPortfolioImageError] = useState(false)
+  const [islamImageError, setIslamImageError] = useState(false)
+  const [gamesImageError, setGamesImageError] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  useEffect(() => {
+    // Check initial theme
+    const checkTheme = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'))
+    }
+
+    checkTheme()
+
+    // Watch for theme changes
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   const container = {
     hidden: { opacity: 0 },
@@ -31,8 +47,8 @@ export function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      <div className="container mx-auto max-w-4xl">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative">
+      <div className="container mx-auto max-w-4xl relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -52,66 +68,122 @@ export function Home() {
           animate="show"
           className="grid gap-6 md:grid-cols-2"
         >
-          {/* Islam Project */}
+          {/* Portfolio */}
           <motion.div variants={item}>
-            <Card className="h-full hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-6 w-6 text-primary" />
-                  {t('home.projects.islam.title')}
-                </CardTitle>
-                <CardDescription>
-                  {t('home.projects.islam.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="aspect-video rounded-md bg-muted flex items-center justify-center mb-4">
-                  <BookOpen className="h-12 w-12 text-muted-foreground/50" />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button asChild className="w-full">
-                  <a
-                    href="https://islam.ryqo.ai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Visit Website <ExternalLink className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
-              </CardFooter>
-            </Card>
-          </motion.div>
-
-          {/* Portfolio Project */}
-          <motion.div variants={item}>
-            <Card className="h-full hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <SpotlightCard className="h-full">
+              <div className="flex flex-col h-full">
+                <div className="flex items-center gap-2 mb-2">
                   <User className="h-6 w-6 text-primary" />
-                  {t('home.projects.portfolio.title')}
-                </CardTitle>
-                <CardDescription>
-                  {t('home.projects.portfolio.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="aspect-video rounded-md bg-muted flex items-center justify-center mb-4">
-                  <User className="h-12 w-12 text-muted-foreground/50" />
+                  <h3 className="text-xl font-semibold">
+                    {t('home.projects.portfolio.title')}
+                  </h3>
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Button asChild className="w-full">
+                <p className="text-muted-foreground mb-4">
+                  {t('home.projects.portfolio.description')}
+                </p>
+                <div className="aspect-video rounded-md overflow-hidden mb-4 bg-muted/20 relative">
+                  {!portfolioImageError ? (
+                    <img
+                      src={`https://api.microlink.io?url=${encodeURIComponent('https://malik.ryqo.ai')}&screenshot=true&meta=false&embed=screenshot.url${isDarkMode ? '&colorScheme=dark' : ''}`}
+                      alt="malik portfolio preview"
+                      className="w-full h-full object-cover"
+                      onError={() => setPortfolioImageError(true)}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-muted/20 text-muted-foreground/50">
+                      <LayoutTemplate className="h-12 w-12" />
+                    </div>
+                  )}
+                </div>
+                <Button asChild className="w-full mt-auto">
                   <a
                     href="https://malik.ryqo.ai"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Visit Website <ExternalLink className="ml-2 h-4 w-4" />
+                    visit website <ExternalLink className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
-              </CardFooter>
-            </Card>
+              </div>
+            </SpotlightCard>
+          </motion.div>
+
+          {/* Islam */}
+          <SpotlightCard className="h-full">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center gap-2 mb-2">
+                <BookOpen className="h-6 w-6 text-primary" />
+                <h3 className="text-xl font-semibold">
+                  {t('home.projects.islam.title')}
+                </h3>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                {t('home.projects.islam.description')}
+              </p>
+              <div className="aspect-video rounded-md overflow-hidden mb-4 bg-muted/20 relative">
+                {!islamImageError ? (
+                  <img
+                    src={`https://api.microlink.io?url=${encodeURIComponent('https://islam.ryqo.ai')}&screenshot=true&meta=false&embed=screenshot.url${isDarkMode ? '&colorScheme=dark' : ''}`}
+                    alt="islam prophets preview"
+                    className="w-full h-full object-cover"
+                    onError={() => setIslamImageError(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-muted/20 text-muted-foreground/50">
+                    <LayoutTemplate className="h-12 w-12" />
+                  </div>
+                )}
+              </div>
+              <Button asChild className="w-full mt-auto">
+                <a
+                  href="https://islam.ryqo.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  visit website <ExternalLink className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            </div>
+          </SpotlightCard>
+
+          {/* Games */}
+          <motion.div variants={item}>
+            <SpotlightCard className="h-full">
+              <div className="flex flex-col h-full">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="h-6 w-6 text-primary" />
+                  <h3 className="text-xl font-semibold">
+                    {t('home.projects.games.title')}
+                  </h3>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  {t('home.projects.games.description')}
+                </p>
+                <div className="aspect-video rounded-md overflow-hidden mb-4 bg-muted/20 relative">
+                  {!gamesImageError ? (
+                    <img
+                      src={`https://api.microlink.io?url=${encodeURIComponent('https://games.ryqo.ai')}&screenshot=true&meta=false&embed=screenshot.url${isDarkMode ? '&colorScheme=dark' : ''}`}
+                      alt="games preview"
+                      className="w-full h-full object-cover"
+                      onError={() => setGamesImageError(true)}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-muted/20 text-muted-foreground/50">
+                      <LayoutTemplate className="h-12 w-12" />
+                    </div>
+                  )}
+                </div>
+                <Button asChild className="w-full mt-auto">
+                  <a
+                    href="https://games.ryqo.ai"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    visit website <ExternalLink className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
+              </div>
+            </SpotlightCard>
           </motion.div>
         </motion.div>
       </div>
